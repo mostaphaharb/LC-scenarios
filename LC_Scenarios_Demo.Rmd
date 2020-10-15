@@ -115,3 +115,81 @@ GrowthRates <- read.csv("Kaala_Data_GR.csv")
 #         "t.pred.lm" = "red"));
 ```
 
+```{r}
+#Source: http://www.sthda.com/english/articles/40-regression-analysis/162-nonlinear-regression-essentials-in-r-polynomial-and-spline-regression-models/
+library(tidyverse)
+library(caret)
+theme_set(theme_classic())
+
+# Load the data
+#data("Boston", package = "MASS")
+GrowthRates <- read.csv("Kaala_Data_GR.csv")
+
+# Split the data into training and test set
+set.seed(123)
+training.samples <- GrowthRates$Plantation_GR %>%
+  createDataPartition(p = 0.9, list = FALSE)
+train.data  <- GrowthRates[training.samples, ]
+test.data <- GrowthRates[-training.samples, ]
+ggplot(train.data, aes(Year, Plantation_GR) ) +
+  geom_point() +
+  stat_smooth()
+
+
+##Linear Regression
+# Build the model
+model <- lm(Plantation_GR ~ Year, data = train.data)
+# Make predictions
+predictions <- model %>% predict(test.data)
+# Model performance
+data.frame(
+  RMSE = RMSE(predictions, test.data$Plantation_GR),
+  R2 = R2(predictions, test.data$Plantation_GR)
+)
+
+#visualize the data
+ggplot(train.data, aes(Year, Plantation_GR) ) +
+  geom_point() +
+  stat_smooth(method = lm, formula = y ~ x)
+
+
+#Polynomial regression
+#lm(Plantation_GR ~ poly(Year, 2, raw = TRUE), data = train.data)
+#lm(Plantation_GR ~ poly(Year, 6, raw = TRUE), data = train.data) %>%
+
+
+# Build the model
+ model <- lm(Plantation_GR ~ poly(Year, 2, raw = TRUE), data = train.data)
+ # Make predictions
+ predictions <- model %>% predict(test.data)
+ # Model performance
+ data.frame(
+   RMSE = RMSE(predictions, test.data$Plantation_GR),
+   R2 = R2(predictions, test.data$Plantation_GR)
+ )
+#
+#
+ ggplot(train.data, aes(Year, Plantation_GR) ) +
+   geom_point() +
+   stat_smooth(method = lm, formula = y ~ poly(x, 5, raw = TRUE))
+
+
+# ##Log transformation
+# # Build the model
+model <- lm(Plantation_GR ~ log(Year), data = train.data)
+# Make predictions
+predictions <- model %>% predict(test.data)
+# Model performance
+data.frame(
+  RMSE = RMSE(predictions, test.data$Plantation_GR),
+  R2 = R2(predictions, test.data$Plantation_GR)
+)
+
+#Visualize the data
+ggplot(train.data, aes(Year, Plantation_GR) ) +
+  geom_point() +
+  stat_smooth(method = lm, formula = y ~ log(x))
+
+
+```
+
