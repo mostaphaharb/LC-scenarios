@@ -1,0 +1,117 @@
+---
+title: "LC_simulations"
+author: "MHarb"
+date: "15/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+#source 1: https://www.datanovia.com/en/lessons/transform-data-to-normal-distribution-in-r/
+library(ggpubr)
+library(moments)
+
+#Demo data Kaala growth
+GrowthRates <- read.csv("Kaala_Data_GR.csv")
+skewness(GrowthRates$Plantation_GR, na.rm = TRUE)
+skewness(GrowthRates$Crops_GR, na.rm = TRUE)
+head(GrowthRates)
+
+#Plantation: ..... .
+# Agri: .....
+# Distribution of Plantation growth rate variable
+ggdensity(GrowthRates, x = "Plantation_GR", fill = "lightgray", title = "Plantation") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+
+# Distribution of agri growth rate variable
+ggdensity(GrowthRates, x = "Crops_GR", fill = "lightgray", title = "crops") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+
+# #transformation 
+# GrowthRates$Plantation_GR <- log10(GrowthRates$Plantation_GR)
+# GrowthRates$Crops_GR <- log10(max(GrowthRates$Crops_GR+1) - GrowthRates$Crops_GR)
+# 
+# # Distribution of Plantation growth rate variable
+# ggdensity(GrowthRates, x = "Plantation_GR", fill = "lightgray", title = "Plantation") +
+#   stat_overlay_normal_density(color = "red", linetype = "dashed")
+# 
+# # Distribution of agri growth rate variable
+# ggdensity(GrowthRates, x = "Crops_GR", fill = "lightgray", title = "crops") +
+#   stat_overlay_normal_density(color = "red", linetype = "dashed")
+# 
+# 
+# skewness(GrowthRates$Plantation_GR, na.rm = TRUE)
+# skewness(GrowthRates$Crops_GR, na.rm = TRUE)
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+#Source:http://www.sthda.com/english/articles/40-regression-analysis/166-predict-in-r-model-predictions-and-confidence-intervals/
+
+#linear extrapolation
+# 0. Build linear model 
+GrowthRates <- read.csv("Kaala_Data_GR.csv")
+ model <- lm(Plantation_GR ~ Year, data = GrowthRates)
+ # 1. Add predictions 
+ pred.int <- predict(model, interval = "prediction")
+ mydata <- cbind(GrowthRates, pred.int)
+ # 2. Regression line + confidence intervals
+ library("ggplot2")
+ p <- ggplot(mydata, aes(Year, Plantation_GR)) +
+   geom_point() +
+   stat_smooth(method = lm)
+ # 3. Add prediction intervals
+ p + geom_line(aes(y = lwr), color = "red", linetype = "dashed")+
+     geom_line(aes(y = upr), color = "red", linetype = "dashed")
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+#Source:https://stackoverflow.com/questions/49274212/extrapolation-in-r
+# Non-linear power law fit
+GrowthRates <- read.csv("Kaala_Data_GR.csv")
+# model <- nls( Plantation_GR ~ Year^2, data = GrowthRates)#,
+    #start = list(a = 0.4, b = -0.7))    
+    #na.action = na.exclude);
+ 
+ 
+# # Linear fit with log-log transformation
+# fit.lm <- lm(
+#     log(t) ~ log(v),
+#     data = w[-1, ])
+# 
+# # Plot
+# w %>%
+#     rename(t.src = t) %>%
+#     mutate(
+#         t.pred.nls = predict(fit.nls, data.frame(v = v)),
+#         t.NA.pred.nls = ifelse(
+#             is.na(t.src),
+#             predict(fit.nls, data.frame(v = v)),
+#             t.src),
+#         t.pred.lm = exp(predict(fit.lm, data.frame(v = v)))) %>%
+# gather(source, t, 3:5) %>%
+# ggplot(aes(v, t, colour = source)) +
+#     geom_line() +
+#     geom_point(aes(v, t.src), colour = "black") +
+#     scale_colour_manual(values = c(
+#         "t.NA.pred.nls" = "black",
+#         "t.pred.nls" = "blue",
+#         "t.pred.lm" = "red"));
+```
+
