@@ -1,0 +1,153 @@
+---
+title: "Demand_prj_Sc"
+author: "MHarb"
+date: "20/10/2020"
+output: powerpoint_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## R Markdown
+
+This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Output
+
+```{r cars, echo = TRUE}
+summary(cars)
+```
+
+## Slide with Plot
+
+```{r pressure}
+plot(pressure)
+```
+
+```{r}
+#source 1: https://www.datanovia.com/en/lessons/transform-data-to-normal-distribution-in-r/
+
+#Drawing the raw data
+library(ggpubr)
+library(moments)
+library(ggplot2)
+
+#Demo data Kaala growth
+GrowthRates <- read.csv("Kaala_Data_GR.csv")
+#skewness(GrowthRates$Plantation_GR, na.rm = TRUE)
+#skewness(GrowthRates$Crops_GR, na.rm = TRUE)
+head(GrowthRates)
+
+#Plantation: ..... .
+# Agri: .....
+# Distribution of Plantation growth rate variable
+ggdensity(GrowthRates, x = "Plantation_GR", fill = "lightgray", title = "Plantation") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+
+# Distribution of crops growth rate variable
+ggdensity(GrowthRates, x = "Crops_GR", fill = "lightgray", title = "crops") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+
+# Distribution of Rainfed growth rate variable
+ggdensity(GrowthRates, x = "Rainfed_GR", fill = "lightgray", title = "Rainfed") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+# Distribution of Irrigated growth rate variable
+ggdensity(GrowthRates, x = "Irrigated_GR", fill = "lightgray", title = "Irrigated") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+# Distribution of Total_Agri variable
+ggdensity(GrowthRates, x = "Total_GR", fill = "lightgray", title = "Total_Agri") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+```
+```{r}
+#Transforming to normal
+#Source:https://rdrr.io/cran/Johnson/man/Johnson-package.html
+##Johnson Transformation
+library(Johnson)
+
+rawdata <- read.csv("Kaala_Data_GR.csv")
+
+x1 <- rawdata$Rainfed_GR
+x2 <- rawdata$Irrigated_GR
+x3 <- rawdata$Crops_GR
+x4 <- rawdata$Plantation_GR
+x5 <- rawdata$Total_GR
+
+y1=RE.Johnson(x1)
+z1 <- RE.Johnson(y1$transformed)
+#skewness(z1$transformed, na.rm = TRUE)
+
+y2=RE.Johnson(x2)
+z2 <- RE.Johnson(y2$transformed)
+
+y3=RE.Johnson(x3)
+z3 <- RE.Johnson(y3$transformed)
+
+y4=RE.Johnson(x4)
+z4 <- RE.Johnson(y4$transformed)
+
+y5=RE.Johnson(x5)
+z5 <- RE.Johnson(y5$transformed)
+
+dfrm <- data.frame(z1,z2,z3,z4,z5)
+write.csv(dfrm,'normal_trans02.csv')
+```
+
+```{r}
+#3.checking normality after the tranformation
+#Drawing the raw data
+library(ggpubr)
+library(moments)
+library(ggplot2)
+
+#Demo data Kaala growth
+GrowthRates <- read.csv("normal_trans02.csv")
+head(GrowthRates)
+
+# Distribution of Plantation growth rate variable
+ggdensity(GrowthRates, x = "transformed", fill = "lightgray", title = "Plantation") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+
+# Distribution of crops growth rate variable
+ggdensity(GrowthRates, x = "transformed.1", fill = "lightgray", title = "crops") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+
+# Distribution of Rainfed growth rate variable
+ggdensity(GrowthRates, x = "transformed.2", fill = "lightgray", title = "Rainfed") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+# Distribution of Irrigated growth rate variable
+ggdensity(GrowthRates, x = "transformed.3", fill = "lightgray", title = "Irrigated") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+# Distribution of Total_Agri variable
+ggdensity(GrowthRates, x = "transformed.4", fill = "lightgray", title = "Total_Agri") +
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+```
+```{r}
+#source:https://stats.stackexchange.com/questions/43482/transformation-to-increase-kurtosis-and-skewness-of-normal-r-v
+fs = function(x,epsilon,delta) dnorm(sinh(delta*asinh(x)-epsilon))*delta*cosh(delta*asinh(x)-epsilon)/sqrt(1+x^2)
+
+vec = seq(-15,15,0.001)
+
+plot(vec,fs(vec,0,1),type="l")
+points(vec,fs(vec,1,1),type="l",col="red")
+points(vec,fs(vec,2,1),type="l",col="blue")
+points(vec,fs(vec,-1,1),type="l",col="red")
+points(vec,fs(vec,-2,1),type="l",col="blue")
+
+vec = seq(-5,5,0.001)
+
+plot(vec,fs(vec,0,0.5),type="l",ylim=c(0,1))
+points(vec,fs(vec,0,0.75),type="l",col="red")
+points(vec,fs(vec,0,1),type="l",col="blue")
+points(vec,fs(vec,0,1.25),type="l",col="red")
+points(vec,fs(vec,0,1.5),type="l",col="blue")
+```
+

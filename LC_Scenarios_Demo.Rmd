@@ -64,8 +64,9 @@ You can also embed plots, for example:
 
 #linear extrapolation
 # 0. Build linear model 
-GrowthRates <- read.csv("Kaala_Data_GR.csv")
+GrowthRates <- read.csv("transformed.csv")#("Kaala_Data_GR.csv")
  model <- lm(Plantation_GR ~ Year, data = GrowthRates)
+ #model <- lm(Plantation_GR ~ poly(Year, 3, raw = TRUE), data = GrowthRates)
  # 1. Add predictions 
  pred.int <- predict(model, interval = "prediction")
  mydata <- cbind(GrowthRates, pred.int)
@@ -83,36 +84,7 @@ GrowthRates <- read.csv("Kaala_Data_GR.csv")
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 ```{r}
 #Source:https://stackoverflow.com/questions/49274212/extrapolation-in-r
-# Non-linear power law fit
-GrowthRates <- read.csv("Kaala_Data_GR.csv")
-# model <- nls( Plantation_GR ~ Year^2, data = GrowthRates)#,
-    #start = list(a = 0.4, b = -0.7))    
-    #na.action = na.exclude);
- 
- 
-# # Linear fit with log-log transformation
-# fit.lm <- lm(
-#     log(t) ~ log(v),
-#     data = w[-1, ])
-# 
-# # Plot
-# w %>%
-#     rename(t.src = t) %>%
-#     mutate(
-#         t.pred.nls = predict(fit.nls, data.frame(v = v)),
-#         t.NA.pred.nls = ifelse(
-#             is.na(t.src),
-#             predict(fit.nls, data.frame(v = v)),
-#             t.src),
-#         t.pred.lm = exp(predict(fit.lm, data.frame(v = v)))) %>%
-# gather(source, t, 3:5) %>%
-# ggplot(aes(v, t, colour = source)) +
-#     geom_line() +
-#     geom_point(aes(v, t.src), colour = "black") +
-#     scale_colour_manual(values = c(
-#         "t.NA.pred.nls" = "black",
-#         "t.pred.nls" = "blue",
-#         "t.pred.lm" = "red"));
+
 ```
 
 ```{r}
@@ -123,19 +95,19 @@ theme_set(theme_classic())
 
 # Load the data
 #data("Boston", package = "MASS")
-GrowthRates <- read.csv("Kaala_Data_GR.csv")
+GrowthRates <- read.csv("transformed.csv")#("Kaala_Data_GR.csv")
 
 # Split the data into training and test set
 set.seed(123)
 training.samples <- GrowthRates$Plantation_GR %>%
-  createDataPartition(p = 0.9, list = FALSE)
+  createDataPartition(p = 0.7, list = FALSE)
 train.data  <- GrowthRates[training.samples, ]
 test.data <- GrowthRates[-training.samples, ]
 ggplot(train.data, aes(Year, Plantation_GR) ) +
   geom_point() +
   stat_smooth()
 
-
+#
 ##Linear Regression
 # Build the model
 model <- lm(Plantation_GR ~ Year, data = train.data)
@@ -159,7 +131,7 @@ ggplot(train.data, aes(Year, Plantation_GR) ) +
 
 
 # Build the model
- model <- lm(Plantation_GR ~ poly(Year, 2, raw = TRUE), data = train.data)
+ model <- lm(Plantation_GR ~ poly(Year, 3, raw = TRUE), data = train.data)
  # Make predictions
  predictions <- model %>% predict(test.data)
  # Model performance
@@ -167,13 +139,15 @@ ggplot(train.data, aes(Year, Plantation_GR) ) +
    RMSE = RMSE(predictions, test.data$Plantation_GR),
    R2 = R2(predictions, test.data$Plantation_GR)
  )
+
 #
 #
  ggplot(train.data, aes(Year, Plantation_GR) ) +
    geom_point() +
-   stat_smooth(method = lm, formula = y ~ poly(x, 5, raw = TRUE))
-
-
+  stat_smooth(method = lm, formula = y ~ poly(x, 3, raw = TRUE))
+# library(ISLR)
+#  summary(lm(Plantation_GR ~ poly(Year, 5, raw = TRUE), data = train.data))$coef
+# 
 # ##Log transformation
 # # Build the model
 model <- lm(Plantation_GR ~ log(Year), data = train.data)
@@ -190,6 +164,32 @@ ggplot(train.data, aes(Year, Plantation_GR) ) +
   geom_point() +
   stat_smooth(method = lm, formula = y ~ log(x))
 
+
+```
+
+```{r}
+#Source:https://rdrr.io/cran/Johnson/man/Johnson-package.html
+##Johnson Transformation
+library(Johnson)
+# transforming to normality a random sample with beta distribution
+# x <- rbeta(30,2,3)
+# x
+# dim(x)
+x <- read.csv("Kaala_Data_GR_2N.csv")
+x <- x$Plantation_GR
+dim(x)
+ y <- RE.Johnson(x); print(y)
+ 
+ 
+ write.csv(y,'normal_trans.csv')
+
+# # working with the transformed variable
+# x <- runif(100)
+# y <- RE.Johnson(x) $ transformed; print(y)
+# 
+# # working with the p-values
+# x <- rgamma(100,2,1)
+# y <- RE.Johnson(x)$p; print(y)
 
 ```
 
