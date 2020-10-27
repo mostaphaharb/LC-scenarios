@@ -40,15 +40,12 @@ plot(pressure)
 library(ggpubr)
 library(moments)
 library(ggplot2)
-
-#Demo data Kaala growth
+library(bestNormalize)
+#Demo data ElKaala Province growth rates
 GrowthRates <- read.csv("Kaala_Data_GR.csv")
-#skewness(GrowthRates$Plantation_GR, na.rm = TRUE)
-#skewness(GrowthRates$Crops_GR, na.rm = TRUE)
+ 
 head(GrowthRates)
 
-#Plantation: ..... .
-# Agri: .....
 # Distribution of Plantation growth rate variable
 ggdensity(GrowthRates, x = "Plantation_GR", fill = "lightgray", title = "Plantation") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
@@ -60,87 +57,87 @@ ggdensity(GrowthRates, x = "Crops_GR", fill = "lightgray", title = "crops") +
 # Distribution of Rainfed growth rate variable
 ggdensity(GrowthRates, x = "Rainfed_GR", fill = "lightgray", title = "Rainfed") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
+
 # Distribution of Irrigated growth rate variable
 ggdensity(GrowthRates, x = "Irrigated_GR", fill = "lightgray", title = "Irrigated") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
 # Distribution of Total_Agri variable
+
 ggdensity(GrowthRates, x = "Total_GR", fill = "lightgray", title = "Total_Agri") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
-```
-```{r}
-#Transforming to normal
-#Source:https://rdrr.io/cran/Johnson/man/Johnson-package.html
-##Johnson Transformation
-library(Johnson)
 
-rawdata <- read.csv("Kaala_Data_GR.csv")
 
-x1 <- rawdata$Rainfed_GR
-x2 <- rawdata$Irrigated_GR
-x3 <- rawdata$Crops_GR
-x4 <- rawdata$Plantation_GR
-x5 <- rawdata$Total_GR
 
-y1=RE.Johnson(x1)
-z1 <- RE.Johnson(y1$transformed)
-#skewness(z1$transformed, na.rm = TRUE)
+# Store the transformation objects
+yj_Plantation <- yeojohnson(GrowthRates$Plantation_GR,standardize=TRUE)
+yj_Crops <- yeojohnson(GrowthRates$Crops_GR,standardize=TRUE)
+yj_Rainfed <- yeojohnson(GrowthRates$Rainfed_GR,standardize=TRUE)
+yj_Irrigated <- yeojohnson(GrowthRates$Irrigated_GR,standardize=TRUE)
+yj_Total <- yeojohnson(GrowthRates$Total_GR,standardize=TRUE)
 
-y2=RE.Johnson(x2)
-z2 <- RE.Johnson(y2$transformed)
+# # Perform transformation
+yj_Plantation_vals <- predict(yj_Plantation)
+yj_Crops_vals <- predict(yj_Crops)
+yj_Rainfed_vals <- predict(yj_Rainfed)
+yj_Irrigated_vals <- predict(yj_Irrigated)
+yj_Total_vals <- predict(yj_Total)
 
-y3=RE.Johnson(x3)
-z3 <- RE.Johnson(y3$transformed)
+skewness(GrowthRates$Plantation_GR, na.rm = TRUE)
+skewness(GrowthRates$Crops_GR, na.rm = TRUE)
+skewness(GrowthRates$Rainfed_GR, na.rm = TRUE)
+skewness(GrowthRates$Irrigated_GR, na.rm = TRUE)
+skewness(GrowthRates$Total_GR, na.rm = TRUE)
+  
+skewness(yj_Plantation_vals, na.rm = TRUE)
+skewness(yj_Crops_vals, na.rm = TRUE)
+skewness(yj_Rainfed_vals, na.rm = TRUE)
+skewness(yj_Irrigated_vals, na.rm = TRUE)
+skewness(yj_Total_vals, na.rm = TRUE)
 
-y4=RE.Johnson(x4)
-z4 <- RE.Johnson(y4$transformed)
+#storing in a file
+dfrm <- data.frame(yj_Plantation_vals=yj_Plantation_vals,yj_Crops_vals=yj_Crops_vals,yj_Rainfed_vals=yj_Rainfed_vals,yj_Irrigated_vals=yj_Irrigated_vals,yj_Total_vals=yj_Total_vals)
+write.table(dfrm, file="yj_ElKalaa_Trans.csv", sep=",", row.names=FALSE, col.names=TRUE)
 
-y5=RE.Johnson(x5)
-z5 <- RE.Johnson(y5$transformed)
-
-dfrm <- data.frame(z1,z2,z3,z4,z5)
-write.csv(dfrm,'normal_trans02.csv')
-```
-
-```{r}
-#3.checking normality after the tranformation
-#Drawing the raw data
-library(ggpubr)
-library(moments)
-library(ggplot2)
-
-#Demo data Kaala growth
-GrowthRates <- read.csv("normal_trans02.csv")
-head(GrowthRates)
+#Shapes after the transformation
+#Demo data ElKaala Province growth rates
+GrowthRates <- read.csv("yj_ElKalaa_Trans.csv")
+ 
 
 # Distribution of Plantation growth rate variable
-ggdensity(GrowthRates, x = "transformed", fill = "lightgray", title = "Plantation") +
+ggdensity(GrowthRates, x = "yj_Plantation_vals", fill = "lightgray", title = "yj_Plantation_vals") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
 
 # Distribution of crops growth rate variable
-ggdensity(GrowthRates, x = "transformed.1", fill = "lightgray", title = "crops") +
+ggdensity(GrowthRates, x = "yj_Crops_vals", fill = "lightgray", title = "yj_Crops_vals") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
 
 # Distribution of Rainfed growth rate variable
-ggdensity(GrowthRates, x = "transformed.2", fill = "lightgray", title = "Rainfed") +
+ggdensity(GrowthRates, x = "yj_Rainfed_vals", fill = "lightgray", title = "yj_Rainfed_vals") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
+
 # Distribution of Irrigated growth rate variable
-ggdensity(GrowthRates, x = "transformed.3", fill = "lightgray", title = "Irrigated") +
+ggdensity(GrowthRates, x = "yj_Irrigated_vals", fill = "lightgray", title = "yj_Irrigated_vals") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
 # Distribution of Total_Agri variable
-ggdensity(GrowthRates, x = "transformed.4", fill = "lightgray", title = "Total_Agri") +
+
+ggdensity(GrowthRates, x = "yj_Total_vals", fill = "lightgray", title = "yj_Total_vals") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
+
+
 ```
+
 ```{r}
 #The extrapolation code is working perfect
- library(forecast)
-h <- 10
-x <- read.csv("transformed.csv")
-marathon <- ts(x[,2:length(x)], start = 2004, end = 2018)
+library(forecast)
+h <- 32
+x <- read.csv("yj_ElKalaa_Trans.csv")
+marathon <- ts(x$yj_Crops_vals, start = 2004, end = 2018)
+#marathon <- ts(x[,2:length(x)], start = 2004, end = 2018)
 fit.lin <- tslm(marathon ~ trend)
 fcasts.lin <- forecast(fit.lin, h = h)
-fit.exp <- tslm(marathon ~ trend, lambda = 0)
+#fit.exp <- tslm(marathon ~ trend, lambda = 0)
 
-fcasts.exp <- forecast(fit.exp, h = h)
+#fcasts.exp <- forecast(fit.exp, h = h)
 
 t <- time(marathon)
 t.break1 <- 2030
@@ -161,20 +158,34 @@ fit.spline <- tslm(marathon ~ t + I(t^2) + I(t^3) +
   I(tb1^3) + I(tb2^3))
 fcasts.spl <- forecast(fit.spline, newdata = newdata)
 
+
+
 autoplot(marathon) +
   autolayer(fitted(fit.lin), series = "Linear") +
-  autolayer(fitted(fit.exp), series = "Exponential") +
+  #autolayer(fitted(fit.exp), series = "Exponential") +
   autolayer(fitted(fit.pw), series = "Piecewise") +
   autolayer(fitted(fit.spline), series = "Cubic Spline") +
   autolayer(fcasts.pw, series="Piecewise") +
   autolayer(fcasts.lin, series="Linear", PI=FALSE) +
-  autolayer(fcasts.exp, series="Exponential", PI=FALSE) +
+  #autolayer(fcasts.exp, series="Exponential", PI=FALSE) +
   autolayer(fcasts.spl, series="Cubic Spline", PI=FALSE) +
   xlab("Year") + ylab("LC Growth rate") +
   ggtitle("Growth Demand") +
   guides(colour = guide_legend(title = " "))
 
  
+#storing in a file
+dfrm_fcasts <- data.frame(fcasts.pw=fcasts.pw,fcasts.lin=fcasts.lin,fcasts.spl=fcasts.spl)
+write.table(dfrm_fcasts, file="yj_ElKalaa_Trans_fcasts.csv", sep=",", row.names=FALSE, col.names=TRUE)
+
+
+x <- read.csv("yj_ElKalaa_Trans_fcasts.csv")
+
+yj_obj <- yeojohnson(x$fcasts.spl.Point.Forecast,standardize=TRUE)
+
+orig_vals <- predict(yj_obj, newdata = x$fcasts.spl.Point.Forecast, inverse = TRUE)
+write.table(orig_vals, file="yj_ElKalaa_fcasts_origvals.csv", sep=",", row.names=FALSE, col.names=TRUE)
+
 
 ```
 
@@ -185,7 +196,9 @@ autoplot(marathon) +
 fs = function(x,epsilon,delta) dnorm(sinh(delta*asinh(x)-epsilon))*delta*cosh(delta*asinh(x)-epsilon)/sqrt(1+x^2)
 
 GrowthRates <- read.csv("normal_trans02.csv")
-GR = seq(-4,4,0.0001)#GrowthRates$transformed#
+
+
+GR = seq(-5,5,0.0001)#GrowthRates$transformed#
 
 plot(GR,fs(GR,0,1), 
      type="l",     
@@ -193,49 +206,11 @@ plot(GR,fs(GR,0,1),
      ,col="black")
 points(vec,fs(vec,1,1),type="l",lty=2,col="green")
 points(vec,fs(vec,2,1),type="l",lty=2,col="blue")
+points(vec,fs(vec,3,1),type="l",lty=2,col="pink")
 points(vec,fs(vec,-1,1),type="l",lty=2,col="brown")
 points(vec,fs(vec,-2,1),type="l",lty=2,col="red")
-
-# GR = seq(-0,2,0.001)#GrowthRates$transformed#
-# 
-# plot(vec,fs(vec,0,0.5),type="l",ylim=c(0,1))
-# points(vec,fs(vec,0,0.75),type="l",col="red")
-# points(vec,fs(vec,0,1),type="l",col="blue")
-# points(vec,fs(vec,0,1.25),type="l",col="red")
-# points(vec,fs(vec,0,1.5),type="l",col="blue")
-```
-
-
-
-```{r}
-#Source:https://stackoverflow.com/questions/56313594/reverse-johnson-transformation
-# This transformation to normal and inverting it is working perfectly
-library(bestNormalize)
-
-mydata <- read.csv("Kaala_Data_GR.csv")
-
-mydata$Rainfed_GR
-skewness(mydata$Rainfed_GR, na.rm = TRUE)
-
-# Store the transformation object
-yj_obj <- yeojohnson(mydata$Rainfed_GR,standardize=TRUE)
-yj_obj
-
-# # Perform transformation
- yj_vals <- predict(yj_obj)
-yj_vals
-skewness(yj_vals, na.rm = TRUE)
-
-# 
-# # Reverse transformation
- orig_vals <- predict(yj_obj, newdata = yj_vals, inverse = TRUE)
-orig_vals
-# 
-# # Should be the same as the original values
- all.equal(orig_vals, mydata$new)
- 
- #print(Back_2_Orig)
-#write.csv(c(mydata$Rainfed_GR,yj_vals),'Back_2_Orig.csv')
+points(vec,fs(vec,-3,1),type="l",lty=2,col="grey")
 
 ```
+
 
