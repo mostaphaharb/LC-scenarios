@@ -15,22 +15,23 @@ This is an R Markdown presentation. Markdown is a simple formatting syntax for a
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
 
-## Slide with Bullets
-
-- Bullet 1
-- Bullet 2
-- Bullet 3
-
-## Slide with R Output
-
-```{r cars, echo = TRUE}
-summary(cars)
-```
 
 ## Slide with Plot
 
 ```{r pressure}
-plot(pressure)
+#Growth Rates calculation (postponed as for the mean time manual calculation using excel is sufficient)
+
+# Irr_GR <- Gro# GrowthRates <- read.csv("Kaala_Data.csv")
+# 
+# head(GrowthRates)
+# Bour_GR <- GrowthRates$Bour
+# 
+#  wthRates$Irr
+# agri_GR <- GrowthRates$agri
+# plantation_GR <- GrowthRates$plantation
+# Total.Agri_GR <- GrowthRates$Total.Agri
+
+# write.table(dfrm, file="Kaala_Data_GR00.csv", sep=",", row.names=FALSE, col.names=TRUE)
 ```
 
 ```{r}
@@ -41,6 +42,8 @@ library(ggpubr)
 library(moments)
 library(ggplot2)
 library(bestNormalize)
+
+
 #Demo data ElKaala Province growth rates
 GrowthRates <- read.csv("Kaala_Data_GR.csv")
  
@@ -54,49 +57,53 @@ ggdensity(GrowthRates, x = "Plantation_GR", fill = "lightgray", title = "Plantat
 ggdensity(GrowthRates, x = "Crops_GR", fill = "lightgray", title = "crops") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
 
-# Distribution of Rainfed growth rate variable
-ggdensity(GrowthRates, x = "Rainfed_GR", fill = "lightgray", title = "Rainfed") +
-  stat_overlay_normal_density(color = "red", linetype = "dashed")
-
-# Distribution of Irrigated growth rate variable
-ggdensity(GrowthRates, x = "Irrigated_GR", fill = "lightgray", title = "Irrigated") +
-  stat_overlay_normal_density(color = "red", linetype = "dashed")
-# Distribution of Total_Agri variable
-
-ggdensity(GrowthRates, x = "Total_GR", fill = "lightgray", title = "Total_Agri") +
-  stat_overlay_normal_density(color = "red", linetype = "dashed")
-
+# # Distribution of Rainfed growth rate variable
+# ggdensity(GrowthRates, x = "Rainfed_GR", fill = "lightgray", title = "Rainfed") +
+#   stat_overlay_normal_density(color = "red", linetype = "dashed")
+# 
+# # Distribution of Irrigated growth rate variable
+# ggdensity(GrowthRates, x = "Irrigated_GR", fill = "lightgray", title = "Irrigated") +
+#   stat_overlay_normal_density(color = "red", linetype = "dashed")
+# # Distribution of Total_Agri variable
+# 
+# ggdensity(GrowthRates, x = "Total_GR", fill = "lightgray", title = "Total_Agri") +
+#   stat_overlay_normal_density(color = "red", linetype = "dashed")
+# 
 
 
 # Store the transformation objects
-yj_Plantation <- yeojohnson(GrowthRates$Plantation_GR,standardize=TRUE)
-yj_Crops <- yeojohnson(GrowthRates$Crops_GR,standardize=TRUE)
-yj_Rainfed <- yeojohnson(GrowthRates$Rainfed_GR,standardize=TRUE)
-yj_Irrigated <- yeojohnson(GrowthRates$Irrigated_GR,standardize=TRUE)
-yj_Total <- yeojohnson(GrowthRates$Total_GR,standardize=TRUE)
+yj_Plantation <- yeojohnson(GrowthRates$Plantation_GR,standardize=FALSE)
+yj_Crops <- yeojohnson(GrowthRates$Crops_GR,standardize=FALSE)
+# yj_Rainfed <- yeojohnson(GrowthRates$Rainfed_GR,standardize=TRUE)
+# yj_Irrigated <- yeojohnson(GrowthRates$Irrigated_GR,standardize=TRUE)
+# yj_Total <- yeojohnson(GrowthRates$Total_GR,standardize=TRUE)
 
 # # Perform transformation
 yj_Plantation_vals <- predict(yj_Plantation)
 yj_Crops_vals <- predict(yj_Crops)
-yj_Rainfed_vals <- predict(yj_Rainfed)
-yj_Irrigated_vals <- predict(yj_Irrigated)
-yj_Total_vals <- predict(yj_Total)
-
+# yj_Rainfed_vals <- predict(yj_Rainfed)
+# yj_Irrigated_vals <- predict(yj_Irrigated)
+# yj_Total_vals <- predict(yj_Total)
+print("Before")
 skewness(GrowthRates$Plantation_GR, na.rm = TRUE)
 skewness(GrowthRates$Crops_GR, na.rm = TRUE)
-skewness(GrowthRates$Rainfed_GR, na.rm = TRUE)
-skewness(GrowthRates$Irrigated_GR, na.rm = TRUE)
-skewness(GrowthRates$Total_GR, na.rm = TRUE)
-  
+# skewness(GrowthRates$Rainfed_GR, na.rm = TRUE)
+# skewness(GrowthRates$Irrigated_GR, na.rm = TRUE)
+# skewness(GrowthRates$Total_GR, na.rm = TRUE)
+
+print("mean/sd");mean(GrowthRates$Total_GR);sd(GrowthRates$Total_GR)
+print("After")  
 skewness(yj_Plantation_vals, na.rm = TRUE)
 skewness(yj_Crops_vals, na.rm = TRUE)
-skewness(yj_Rainfed_vals, na.rm = TRUE)
-skewness(yj_Irrigated_vals, na.rm = TRUE)
-skewness(yj_Total_vals, na.rm = TRUE)
+# skewness(yj_Rainfed_vals, na.rm = TRUE)
+# skewness(yj_Irrigated_vals, na.rm = TRUE)
+# skewness(yj_Total_vals, na.rm = TRUE)
+
+print("mean_a/sd_a");mean(yj_Total_vals);sd(yj_Total_vals)
 
 #storing in a file
-dfrm <- data.frame(yj_Plantation_vals=yj_Plantation_vals,yj_Crops_vals=yj_Crops_vals,yj_Rainfed_vals=yj_Rainfed_vals,yj_Irrigated_vals=yj_Irrigated_vals,yj_Total_vals=yj_Total_vals)
-write.table(dfrm, file="yj_ElKalaa_Trans.csv", sep=",", row.names=FALSE, col.names=TRUE)
+dfrm <- data.frame(yj_Plantation_vals=yj_Plantation_vals,yj_Crops_vals=yj_Crops_vals)
+write.table(dfrm , file="yj_ElKalaa_Trans.csv", sep=",", row.names=FALSE, col.names=TRUE)
 
 #Shapes after the transformation
 #Demo data ElKaala Province growth rates
@@ -110,18 +117,18 @@ ggdensity(GrowthRates, x = "yj_Plantation_vals", fill = "lightgray", title = "yj
 # Distribution of crops growth rate variable
 ggdensity(GrowthRates, x = "yj_Crops_vals", fill = "lightgray", title = "yj_Crops_vals") +
   stat_overlay_normal_density(color = "red", linetype = "dashed")
-
-# Distribution of Rainfed growth rate variable
-ggdensity(GrowthRates, x = "yj_Rainfed_vals", fill = "lightgray", title = "yj_Rainfed_vals") +
-  stat_overlay_normal_density(color = "red", linetype = "dashed")
-
-# Distribution of Irrigated growth rate variable
-ggdensity(GrowthRates, x = "yj_Irrigated_vals", fill = "lightgray", title = "yj_Irrigated_vals") +
-  stat_overlay_normal_density(color = "red", linetype = "dashed")
-# Distribution of Total_Agri variable
-
-ggdensity(GrowthRates, x = "yj_Total_vals", fill = "lightgray", title = "yj_Total_vals") +
-  stat_overlay_normal_density(color = "red", linetype = "dashed")
+# 
+# # Distribution of Rainfed growth rate variable
+# ggdensity(GrowthRates, x = "yj_Rainfed_vals", fill = "lightgray", title = "yj_Rainfed_vals") +
+#   stat_overlay_normal_density(color = "red", linetype = "dashed")
+# 
+# # Distribution of Irrigated growth rate variable
+# ggdensity(GrowthRates, x = "yj_Irrigated_vals", fill = "lightgray", title = "yj_Irrigated_vals") +
+#   stat_overlay_normal_density(color = "red", linetype = "dashed")
+# # Distribution of Total_Agri variable
+# 
+# ggdensity(GrowthRates, x = "yj_Total_vals", fill = "lightgray", title = "yj_Total_vals") +
+#   stat_overlay_normal_density(color = "red", linetype = "dashed")
 
 
 ```
@@ -131,7 +138,7 @@ ggdensity(GrowthRates, x = "yj_Total_vals", fill = "lightgray", title = "yj_Tota
 library(forecast)
 h <- 32
 x <- read.csv("yj_ElKalaa_Trans.csv")
-marathon <- ts(x$yj_Crops_vals, start = 2004, end = 2018)
+marathon <- ts(x$yj_Plantation_vals, start = 2004, end = 2018)#yj_Plantation_vals,yj_Crops_vals
 #marathon <- ts(x[,2:length(x)], start = 2004, end = 2018)
 fit.lin <- tslm(marathon ~ trend)
 fcasts.lin <- forecast(fit.lin, h = h)
@@ -179,12 +186,7 @@ dfrm_fcasts <- data.frame(fcasts.pw=fcasts.pw,fcasts.lin=fcasts.lin,fcasts.spl=f
 write.table(dfrm_fcasts, file="yj_ElKalaa_Trans_fcasts.csv", sep=",", row.names=FALSE, col.names=TRUE)
 
 
-x <- read.csv("yj_ElKalaa_Trans_fcasts.csv")
 
-yj_obj <- yeojohnson(x$fcasts.spl.Point.Forecast,standardize=TRUE)
-
-orig_vals <- predict(yj_obj, newdata = x$fcasts.spl.Point.Forecast, inverse = TRUE)
-write.table(orig_vals, file="yj_ElKalaa_fcasts_origvals.csv", sep=",", row.names=FALSE, col.names=TRUE)
 
 
 ```
@@ -195,22 +197,176 @@ write.table(orig_vals, file="yj_ElKalaa_fcasts_origvals.csv", sep=",", row.names
 # the degree for the different grades of skewness is working perfectly
 fs = function(x,epsilon,delta) dnorm(sinh(delta*asinh(x)-epsilon))*delta*cosh(delta*asinh(x)-epsilon)/sqrt(1+x^2)
 
-GrowthRates <- read.csv("normal_trans02.csv")
-
-
-GR = seq(-5,5,0.0001)#GrowthRates$transformed#
-
-plot(GR,fs(GR,0,1), 
-     type="l",     
+GrowthRates <- read.csv("yj_ElKalaa_Trans_fcasts.csv")
+min <- min(GrowthRates$fcasts.pw.Point.Forecast)
+max <- max(GrowthRates$fcasts.pw.Point.Forecast)
+min
+max
+#GR = seq(min,max,0.0001)
+GR = seq(-5,5,0.0001)
+#GR = seq(-5,5,0.0001)#GrowthRates$transformed#
+#GR = GrowthRates$fcasts.pw.Point.Forecast
+G00 <- plot(GR,fs(GR,0,1), type="l",     
     lty=1,              # Line type: 0=blank, 1=solid, 2=dashed, 3=dotted, 4=dotdash, 5=longdash, 6=twodash  
      ,col="black")
-points(vec,fs(vec,1,1),type="l",lty=2,col="green")
-points(vec,fs(vec,2,1),type="l",lty=2,col="blue")
-points(vec,fs(vec,3,1),type="l",lty=2,col="pink")
-points(vec,fs(vec,-1,1),type="l",lty=2,col="brown")
-points(vec,fs(vec,-2,1),type="l",lty=2,col="red")
-points(vec,fs(vec,-3,1),type="l",lty=2,col="grey")
+G01 <-points(vec,fs(vec,1,1),type="l",lty=2,col="green")
+G02 <-points(vec,fs(vec,2,1),type="l",lty=2,col="blue")
+G03 <-points(vec,fs(vec,3,1),type="l",lty=2,col="pink")
+G04 <-points(vec,fs(vec,-1,1),type="l",lty=2,col="brown")
+G05 <-points(vec,fs(vec,-2,1),type="l",lty=2,col="red")
+G06 <-points(vec,fs(vec,-3,1),type="l",lty=2,col="grey")
 
+#storing in a file
+dfrm_Sk <- data.frame(fs(vec,1,1),fs(vec,2,1),fs(vec,3,1),fs(vec,0,1),fs(vec,-1,1),fs(vec,-2,1),fs(vec,-3,1))
+write.table(dfrm_Sk, file="yj_ElKalaa_Sk.csv", sep=",", row.names=FALSE, col.names=TRUE)
+
+#back to original values
+x <- read.csv("yj_ElKalaa_Sk.csv")
+# fs.vec..1..1.	fs.vec..2..1.	fs.vec..3..1.	fs.vec..0..1.	fs.vec...1..1.	fs.vec...2..1.	fs.vec...3..1.
+
+yj_obj_0 <- yeojohnson(x$fs.vec..0..1.,standardize=TRUE)
+yj_obj_1 <- yeojohnson(x$fs.vec..1..1.,standardize=TRUE)
+yj_obj_2 <- yeojohnson(x$fs.vec..2..1.,standardize=TRUE)
+yj_obj_3 <- yeojohnson(x$fs.vec..3..1.,standardize=TRUE)
+yj_obj_4 <- yeojohnson(x$fs.vec...1..1.,standardize=TRUE)
+yj_obj_5 <- yeojohnson(x$fs.vec...2..1.,standardize=TRUE)
+yj_obj_6 <- yeojohnson(x$fs.vec...3..1.,standardize=TRUE)
+
+
+
+orig_vals_0 <- predict(yj_obj_0, newdata = x$fs.vec..2..1., inverse = TRUE)
+orig_vals_1 <- predict(yj_obj_1, newdata = x$fs.vec..2..1., inverse = TRUE)
+orig_vals_2 <- predict(yj_obj_2, newdata = x$fs.vec..2..1., inverse = TRUE)
+orig_vals_3 <- predict(yj_obj_3, newdata = x$fs.vec..2..1., inverse = TRUE)
+orig_vals_4 <- predict(yj_obj_4, newdata = x$fs.vec..2..1., inverse = TRUE)
+orig_vals_5 <- predict(yj_obj_5, newdata = x$fs.vec..2..1., inverse = TRUE)
+orig_vals_6 <- predict(yj_obj_6, newdata = x$fs.vec..2..1., inverse = TRUE)
+
+dfrm_originalvalues <- data.frame(orig_vals_0,orig_vals_1,orig_vals_2,orig_vals_3,orig_vals_4,orig_vals_5,orig_vals_6)
+write.table(orig_vals, file="yj_ElKalaa_fcasts_origvals.csv", sep=",", row.names=FALSE, col.names=TRUE)
 ```
 
+
+```{r}
+
+#https://www.youtube.com/watch?v=Xfdg0xqFjts
+#how does sample size affect the sampling distribution of means?
+str(iris)
+iter <- 10000
+n <- 5
+mean <- rep(NA, iter)
+
+for (i in 1:iter){
+  #d <- sample(which(iris$Petal.Length > 5 & iris$Petal.Length < 20), n)
+   d <- sample(iris$Petal.Length, n)
+
+  mean[i] <-  mean(d)
+  
+}
+hist(mean)
+abline(v=mean(iris$Petal.Length), lty=2, lwd=3, col="blue")
+```
+```{r}
+# Create a sequence of numbers between -10 and 10 incrementing by 0.1.
+x <- seq(-2, 2, by = 0.001)
+
+# Choose the mean as 2.5 and standard deviation as 0.5.
+y <- rnorm(x, mean = 0, sd = 1)#sample(which(iris$Petal.Length > 0 & iris$Petal.Length < 1000), n)#
+
+# Give the chart file a name.
+png(file = "dnorm.png")
+
+# plot(x,y)
+
+# Save the file.
+dev.off()
+
+hist(y)
+
+iter <-384
+n <- 5
+mean <- rep(NA, iter)
+
+for (i in 1:iter){
+  d <- sample(y, n)
+  mean[i] <-  mean(d)
+  
+}
+hist(mean)
+iter_2 <- 32
+m <- 12
+timesamples <- rep(NA,324)
+for (j in 1:32){
+  s <- sample(mean, m)
+  timesamples[j] <-  mean(s)
+  
+}
+hist(timesamples)
+```
+
+
+
+
+```{r}
+GrowthRates <- read.csv("yj_ElKalaa_Trans_fcasts.csv")
+min <- min(GrowthRates$fcasts.pw.Point.Forecast)
+max <- max(GrowthRates$fcasts.pw.Point.Forecast)
+print(min);print(max)
+# dfrm_originalvalues <- data.frame(min_pw= min,max_pw=max)
+# write.table(dfrm_originalvalues, file="min-max_DF.csv", sep=",", row.names=FALSE, col.names=TRUE)
+
+#how does sample size affect the sampling distribution of means?
+
+skwedvalues<- read.csv("yj_ElKalaa_Sk.csv")
+iter <- 1000
+n <- 3
+mean <- rep(NA, iter)
+set.seed(1) # reproducible
+for (i in 1:iter){
+  #d <- sample(which(skwedvalues$fs.vec..1..1. > min & skwedvalues$fs.vec..3..1. < max), n, replace = FALSE)
+  d <- sample(skwedvalues$fs.vec..1..1., n, replace = FALSE)
+
+  mean[i] <-  mean(d)
+  
+}
+hist(mean)
+abline(v=mean(d), lty=2, lwd=3, col="blue")
+df_draws <- data.frame(mean)
+write.table(df_draws, file="df_draws.csv", sep=",", row.names=FALSE, col.names=TRUE)
+```
+```{r}
+library(ggpubr)
+library(moments)
+library(ggplot2)
+library(bestNormalize)
+GrowthRates <- read.csv("yj_ElKalaa_Trans_fcasts.csv")
+min <- min(GrowthRates$fcasts.pw.Point.Forecast)
+max <- max(GrowthRates$fcasts.pw.Point.Forecast)
+print(min);print(max)
+# dfrm_originalvalues <- data.frame(min_pw= min,max_pw=max)
+# write.table(dfrm_originalvalues, file="min-max_DF.csv", sep=",", row.names=FALSE, col.names=TRUE)
+
+#how does sample size affect the sampling distribution of means?
+#source:https://stackoverflow.com/questions/63678177/r-sample-rows-following-conditions-at-random-within-a-range-of-values-fixed-w
+skwedvalues<- read.csv("yj_ElKalaa_Sk.csv")
+set.seed(1) # reproducible
+# data <- sample(which(skwedvalues$fs.vec..1..1. > min & skwedvalues$fs.vec..1..1. < max), 32)
+draws <- skwedvalues[sample(which(skwedvalues$fs.vec..1..1. > min & skwedvalues$fs.vec..1..1. < max), 32),]
+
+
+head(draws)
+
+# draws
+df_draws <- data.frame(draws)
+write.table(df_draws, file="df_draws.csv", sep=",", row.names=FALSE, col.names=TRUE)
+
+#back to original values
+x <- read.csv("df_draws.csv")
+yj_obj <- yeojohnson(x$fs.vec..2..1.,standardize=TRUE)
+
+orig_vals <- predict(yj_obj, newdata = x$fs.vec..2..1., inverse = TRUE)
+
+dfrm_originalvalues <- data.frame(orig_vals)
+write.table(dfrm_originalvalues, file="df_draws_origvals.csv", sep=",", row.names=FALSE, col.names=TRUE)
+```
 
